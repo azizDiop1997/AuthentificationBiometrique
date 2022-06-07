@@ -8,7 +8,7 @@ def effacementcontour(edges, cols, rows):
 		maxj = 0
 		minj = cols
 		for j in range(int(cols/2), 0, -1):
-			#trouver le pixxel plus proche de milieu
+			#trouver le pixxel plus proche de milieu 
 			if(img[i,j] != 0 and maxj < j) :
 				maxj = j
 			else :
@@ -24,6 +24,9 @@ def effacementcontour(edges, cols, rows):
 				if(img[i,j] != 0) :
 					img[i,j] = 0
 	return img
+
+
+
 			
 def rognerImage(img, edges) :
 	rows, cols = edges.shape
@@ -36,11 +39,16 @@ def rognerImage(img, edges) :
 				minCol = j
 		for j in range(int(cols/2), cols):
 			if(edges[i,j] != 0 and maxCol > j) :
-				maxCol = j	
-	print(minCol, maxCol)	
+				maxCol = j		
 	#Rognage		
 	cropped = img[0:rows, minCol:maxCol]	
 	return cropped
+
+def rognertrntpercent(img) :
+    rows, cols = img.shape
+    print(rows, cols)
+    imageR = img[0:int(rows/3), 0:cols]
+    return imageR
 
 parser = argparse.ArgumentParser()
 
@@ -68,14 +76,15 @@ rows, cols = edges.shape
 
 edgesmodif1 = effacementcontour(edges, cols, rows)
 edgesmodif2 = rognerImage(img, edgesmodif1)
+edgesmodif3 = rognertrntpercent(edgesmodif2)
 #write image modified
-cv2.imwrite(args.outputImg, edgesmodif2) # "testmodified.bmp"
+cv2.imwrite(args.outputImg, edgesmodif3) # "testmodified.bmp"
 
-plt.subplot(211),plt.imshow(edgesmodif1,cmap = 'gray')
+plt.subplot(211),plt.imshow(edgesmodif2,cmap = 'gray')
 plt.title('Edge Detection using Canny after modif1'), plt.xticks([]), plt.yticks([])
-plt.subplot(212),plt.imshow(edgesmodif2,cmap = 'gray')
+plt.subplot(212),plt.imshow(edgesmodif3,cmap = 'gray')
 plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
-#plt.show()
+plt.show()
 
 
 
