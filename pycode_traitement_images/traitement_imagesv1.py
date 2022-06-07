@@ -50,6 +50,13 @@ dest='image',
 help='select image of the finger'
 )
 
+parser.add_argument('-o','--output',
+required=True,
+dest='outputImg',
+help='name of the (tmp) output image'
+)
+
+
 args = parser.parse_args()
 
 #print(args.image)
@@ -62,13 +69,13 @@ rows, cols = edges.shape
 edgesmodif1 = effacementcontour(edges, cols, rows)
 edgesmodif2 = rognerImage(img, edgesmodif1)
 #write image modified
-cv2.imwrite("testmodified.bmp", edgesmodif2)
+cv2.imwrite(args.outputImg, edgesmodif2) # "testmodified.bmp"
 
 plt.subplot(211),plt.imshow(edgesmodif1,cmap = 'gray')
 plt.title('Edge Detection using Canny after modif1'), plt.xticks([]), plt.yticks([])
 plt.subplot(212),plt.imshow(edgesmodif2,cmap = 'gray')
 plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
-plt.show()
+#plt.show()
 
 
 
