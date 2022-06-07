@@ -10,6 +10,12 @@ dest='image',
 help='select image of the finger'
 )
 
+parser.add_argument('-o','--output',
+required=True,
+dest='outputImg',
+help='name of the output image '
+)
+
 
 args = parser.parse_args()
 
@@ -28,12 +34,12 @@ for x in range(0,lenX):
 		#print(im.getpixel(coo))
 		tabOrg.append(im.getpixel(coo))
 
-im.show()
+#im.show()
 
 enh = ImageEnhance.Contrast(im)
-enh.enhance(enhanceFactor).show("improved more contrast")
+#enh.enhance(enhanceFactor).show("improved more contrast")
 
-enh.enhance(enhanceFactor).save("contrasted3.bmp")
+enh.enhance(enhanceFactor).save(args.outputImg)
 
 tabFin=[]
 
