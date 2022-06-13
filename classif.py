@@ -19,41 +19,20 @@ import pathlib
 
 img_height = 320
 img_width = 120
+ds_size=756
+nb_classes=126
 
 def setup():
 
 	dataset_url="http://0.0.0.0:8000/BDD_FingerVeins.tar.gz"
-	# fname='BDD_FingerVeins'
 	data_dir = tf.keras.utils.get_file(fname='DB_clean', origin=dataset_url, untar=True)
-	print("data_dir: ",data_dir)
 	data_dir = pathlib.Path(data_dir)
 	#image_count = len(list(data_dir.glob('001left*/*.bmp')))
 	#image_count = len(list(data_dir.glob('*.bmp'))) #756 all in dir
 	#print("image_count: ",image_count)	
 	
-	imgs = list(data_dir.glob('*/*.bmp')) # trier toutes les images dans des sous dossiers
-	# bmp
-	x=2
-	print(PIL.Image.open(str(imgs[x])))
-	print(str(imgs[x]))
-	PIL.Image.open(str(imgs[x])) ## ???
-	print("---",str(imgs[7]))
-	print("---",str(imgs[3]))
-
-	for i in range (0,756):
-		print(i)
-		if ".bmp" in str(imgs[i]):
-			image = cv2.imread(str(imgs[i]))
-			height, width = image.shape[:2]
-			#print(height, width,str(imgs[i]))
-			if((img_height, img_width)!=(320,120)):
-				print("error",str(imgs[i]),img_height, img_width)
-				#exit(-1)
-		#else:
-			#print(i," rep ",str(imgs[i]))
+	imgs = list(data_dir.glob('*/*.bmp')) # images dans les sous dossiers correspondant à leur classe
 	
-	print("end")
-
 	batch_size = 32
 
 
@@ -65,8 +44,6 @@ def setup():
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
-	print(train_ds)
-
 	val_ds = tf.keras.utils.image_dataset_from_directory(
   data_dir,
   validation_split=0.2,
@@ -77,17 +54,17 @@ def setup():
 
 
 	class_names = train_ds.class_names
-	print(class_names)
-
-	print(train_ds)
-#	plt.figure(figsize=(10, 10))
-#	for images, labels in train_ds.take(1):
-#		for i in range(9):
-#			ax = plt.subplot(3, 3, i + 1)
-#			plt.imshow(images[i].numpy().astype("uint8"))
-#			plt.title(class_names[labels[i]])
-#			plt.axis("off")
-#			print('ok')
+	#print("Classes: ")
+	#print(class_names)
+	
+	#print(train_ds)
+	plt.figure(figsize=(10, 10))
+	for images, labels in train_ds.take(1):
+		for i in range(9):
+			ax = plt.subplot(3, 3, i + 1)
+			plt.imshow(images[i].numpy().astype("uint8"))
+			plt.title(class_names[labels[i]])
+			plt.axis("off")
 
 #	for image_batch, labels_batch in train_ds:
 #		print(image_batch.shape)
@@ -126,7 +103,7 @@ def setup():
   tf.keras.layers.MaxPooling2D(),
   tf.keras.layers.Flatten(),
   tf.keras.layers.Dense(128, activation='relu'),
-  tf.keras.layers.Dense(126)
+  tf.keras.layers.Dense(nb_classes) # nb couches sorties/classes
 ])
 
 
@@ -136,15 +113,87 @@ def setup():
   metrics=['accuracy'])
 # ML : https://www.tensorflow.org/tutorials/images/classification
 
-
-	model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=3
-)
+	epochs=8
+	history = model.fit(train_ds,validation_data=val_ds,epochs=epochs)
 
 
+	model.summary()
 
+	#print(str(imgs[10]))
+	test_images=val_ds
+	probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
+	predictions = probability_model.predict(test_images)
+	
+	#print(str(test_images))
+	#print(test_images)
+
+	#for b in range(5):
+	##for images, labels in test_images.take(1):
+		#for i in range(1):
+				#ax = plt.subplot(3, 3, i + 1)
+				#plt.imshow(images[i].numpy().astype("uint8"))
+				#plt.title(class_names[labels[i]])
+			#print(i,": ",class_names[labels[i]])
+				#plt.axis("off")
+
+	#print(test_images[150])
+
+	#print(str(test_images[0]))
+	#print(str(test_images[150]))
+
+
+	#print(predictions[0])
+	#z=np.argmax(predictions[0])
+	#print(z)
+	#print(class_names[z])
+
+	#print("-----------")
+	#print(predictions[70])	
+#	#print(len(predictions[150]))
+	#y=np.argmax(predictions[70])
+	#print(y)
+	#print(class_names[y])
+
+
+	acc = history.history['accuracy']
+	val_acc = history.history['val_accuracy']
+
+	loss = history.history['loss']
+	val_loss = history.history['val_loss']
+
+	epochs_range = range(epochs)
+
+	plt.figure(figsize=(8, 8))
+	plt.subplot(1, 2, 1)
+	plt.plot(epochs_range, acc, label='Training Accuracy')
+	plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+	plt.legend(loc='lower right')
+	plt.title('Training and Validation Accuracy')
+	
+	plt.subplot(1, 2, 2)
+	plt.plot(epochs_range, loss, label='Training Loss')
+	plt.plot(epochs_range, val_loss, label='Validation Loss')
+	plt.legend(loc='upper right')
+	plt.title('Training and Validation Loss')
+	plt.show()
+
+
+## test
+	#sunflower_url = "https://storage.googleapis.com/download.tensorflow.org/example_images/592px-Red_sunflower.jpg"
+	#sunflower_path = tf.keras.utils.get_file('Red_sunflower', origin=sunflower_url)
+	#sunflower_path = "/home/kali/.keras/datasets/DB_clean/001left_index/001left_index_1.bmp"
+	impath = "/home/kali/.keras/datasets/004left_index_1.bmp"
+
+	img = tf.keras.utils.load_img(impath, target_size=(img_height, img_width))
+	img_array = tf.keras.utils.img_to_array(img)
+	img_array = tf.expand_dims(img_array, 0) # Create a batch
+
+	predictions = model.predict(img_array)
+	score = tf.nn.softmax(predictions[0])
+	print("matrice de prediction",predictions[0])
+	print(predictions[0])
+	print("This image most likely belongs to {} with a {:.2f} percent confidence.".format(class_names[np.argmax(score)], 100 * np.max(score)))
+	print(np.max(score))
 
 
 

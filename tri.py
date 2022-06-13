@@ -9,18 +9,19 @@ directories=[]
 x=9 # longueur chemin avant nom image
 # or use split
 for img in images: 
-	print(img)
-	short=img[x:-6]
-	print(short)
-	if img[x:-6] not in directories:
-		os.system("mkdir {}".format(img[x:-6]))
-	os.system("mv {} {}".format(img,img[x:-6]))
-
-
+	#print(img)
+	short=img.split("/")
+	short=short[-1]
+	#print(short)
+	#print(short[:-6])
+	directory=short[:-6]
+	if directory not in directories:
+		os.system("mkdir {}".format(directory))
+	os.system("mv {} {}".format(img,directory))
 
 os.system('mv 0*/ DB_clean')
 
 # to adapt: / or use keras untar
-#os.system('cp -r BDD_FingerVeins /home/kali/.keras/datasets')
+os.system('DB_clean /home/kali/.keras/datasets')
 
 
