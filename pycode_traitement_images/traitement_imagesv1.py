@@ -46,7 +46,6 @@ def rognerImage(img, edges) :
 
 def rognertrntpercent(img) :
     rows, cols = img.shape
-    print(rows, cols)
     imageR = img[0:int(rows/3), 0:cols]
     return imageR
 
@@ -76,14 +75,14 @@ rows, cols = edges.shape
 
 edgesmodif1 = effacementcontour(edges, cols, rows)
 edgesmodif2 = rognerImage(img, edgesmodif1)
-edgesmodif3 = rognertrntpercent(edgesmodif2)
+#edgesmodif3 = rognertrntpercent(edgesmodif2)
 #write image modified
-cv2.imwrite(args.outputImg, edgesmodif3) # "testmodified.bmp"
+cv2.imwrite(args.outputImg, edgesmodif2) # "testmodified.bmp"
 
 plt.subplot(211),plt.imshow(edgesmodif2,cmap = 'gray')
 plt.title('Edge Detection using Canny after modif1'), plt.xticks([]), plt.yticks([])
-plt.subplot(212),plt.imshow(edgesmodif3,cmap = 'gray')
-plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
+#plt.subplot(212),plt.imshow(edgesmodif3,cmap = 'gray')
+#plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
 plt.show()
 
 
