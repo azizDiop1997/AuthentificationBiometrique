@@ -49,6 +49,12 @@ def rognertrntpercent(img) :
     imageR = img[0:int(rows/3), 0:cols]
     return imageR
 
+def resize(img) :
+	dim = (120, 320)
+	# resize image
+	resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
+	return resized
+	
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-i','--image',
@@ -63,6 +69,12 @@ dest='outputImg',
 help='name of the (tmp) output image'
 )
 
+parser.add_argument('-v','--verbose',
+required=False,
+dest='display',
+help='afficher l\'image'
+)
+
 
 args = parser.parse_args()
 
@@ -75,15 +87,17 @@ rows, cols = edges.shape
 
 edgesmodif1 = effacementcontour(edges, cols, rows)
 edgesmodif2 = rognerImage(img, edgesmodif1)
+edgesresize = resize(edgesmodif2)
 #edgesmodif3 = rognertrntpercent(edgesmodif2)
 #write image modified
-cv2.imwrite(args.outputImg, edgesmodif2) # "testmodified.bmp"
+cv2.imwrite(args.outputImg, edgesresize) # "testmodified.bmp"
 
-plt.subplot(211),plt.imshow(edgesmodif2,cmap = 'gray')
-plt.title('Edge Detection using Canny after modif1'), plt.xticks([]), plt.yticks([])
-#plt.subplot(212),plt.imshow(edgesmodif3,cmap = 'gray')
-#plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
-plt.show()
+if(args.display) :
+	plt.subplot(211),plt.imshow(edgesmodif2,cmap = 'gray')
+	plt.title('Edge Detection using Canny after modif1'), plt.xticks([]), plt.yticks([])
+	plt.subplot(212),plt.imshow(edgesresize,cmap = 'gray')
+	plt.title('Edge Detection using Canny after modif 2'), plt.xticks([]), plt.yticks([])
+	plt.show()
 
 
 
