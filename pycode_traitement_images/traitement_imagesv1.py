@@ -1,6 +1,9 @@
 import argparse
+from msilib.schema import Control
 import cv2 
 from matplotlib import pyplot as plt
+from PIL import Image, ImageFilter
+from PIL import ImageEnhance
 
 def effacementcontour(edges, cols, rows):
 	img = edges
@@ -89,8 +92,18 @@ edgesmodif1 = effacementcontour(edges, cols, rows)
 edgesmodif2 = rognerImage(img, edgesmodif1)
 edgesresize = resize(edgesmodif2)
 #edgesmodif3 = rognertrntpercent(edgesmodif2)
+
 #write image modified
-cv2.imwrite(args.outputImg, edgesresize) # "testmodified.bmp"
+cv2.imwrite("test.bmp", edgesresize) # "testmodified.bmp"
+
+im = Image.open("test.bmp")
+# Contraste
+enhanceFactor=2.2
+enh = ImageEnhance.Contrast(im)
+enh.enhance(enhanceFactor).save(args.outputImg)
+
+#write image modified
+# cv2.imwrite(args.outputImg, edgesmodif2) # "testmodified.bmp"
 
 if(args.display) :
 	plt.subplot(211),plt.imshow(edgesmodif2,cmap = 'gray')
