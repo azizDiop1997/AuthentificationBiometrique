@@ -27,6 +27,11 @@ nb_classes=126
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument('-e','--epochs',
+required="True",
+dest='epochs',
+help='Epochs number, determines how long the algorithm will train')
+
 parser.add_argument('-g','--graph',
 dest='graph',
 help='Displays learing graph of the model, False by default')
@@ -140,29 +145,7 @@ def setup(epochs):
 
 	test_images=val_ds
 	probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
-	predictions = probability_model.predict(test_images)
-
-	#for b in range(5):
-	##for images, labels in test_images.take(1):
-		#for i in range(1):
-				#ax = plt.subplot(3, 3, i + 1)
-				#plt.imshow(images[i].numpy().astype("uint8"))
-				#plt.title(class_names[labels[i]])
-			#print(i,": ",class_names[labels[i]])
-				#plt.axis("off")
-
-
-	#print(predictions[0])
-	#z=np.argmax(predictions[0])
-	#print(z)
-	#print(class_names[z])
-
-	#print("-----------")
-	#print(predictions[70])	
-#	#print(len(predictions[150]))
-	#y=np.argmax(predictions[70])
-	#print(y)
-	#print(class_names[y])
+	predictions = probability_model.predict(test_images)	
 
 	#if args.graph:
 	acc = history.history['accuracy']
@@ -185,26 +168,35 @@ def setup(epochs):
 	plt.plot(epochs_range, val_loss, label='Validation Loss')
 	plt.legend(loc='upper right')
 	plt.title('Training and Validation Loss')
-	plt.show()	
-
-		
-	## test
-	#sunflower_url = "https://storage.googleapis.com/download.tensorflow.org/example_images/592px-Red_sunflower.jpg"
-	#sunflower_path = tf.keras.utils.get_file('Red_sunflower', origin=sunflower_url)
-	#sunflower_path = "/home/kali/.keras/datasets/DB_clean/001left_index/001left_index_1.bmp"
+	plt.show()
 	
-	#img = tf.keras.utils.load_img(impath, target_size=(img_height, img_width))
-	#img_array = tf.keras.utils.img_to_array(img)
-	#img_array = tf.expand_dims(img_array, 0) # Create a batch
-	#predictions = model.predict(img_array)
-	#score = tf.nn.softmax(predictions[0])
-	#print("matrice de prediction",predictions[0])
+	## test
+	#imPath = "/home/kali/.keras/datasets/004left_index_1.bmp"
+	im_paths=["004left_index_1.bmp","006left_middle_3.bmp","009right_ring_1.bmp","015right_index_4.bmp","018right_index_5.bmp","020right_index_6.bmp"]
 
-	#print("This image most likely belongs to {} with a {:.2f} percent confidence.".format(class_names[np.argmax(score)], 100 * np.max(score)))
-	#print(np.max(score))
+
+	for im in im_paths:
+		#path = tf.keras.utils.get_file('DB_clean', origin=im)
+		im="/home/kali/.keras/datasets/"+im
+		targ=im.split("/")[-1]
+		targ=targ[:-6]
+		print("targ=",targ)
+		print("im=",im)
+		img = tf.keras.utils.load_img(im, target_size=(img_height, img_width))
+		img_array = tf.keras.utils.img_to_array(img)
+		img_array = tf.expand_dims(img_array, 0) # Create a batch
+
+		predictions = model.predict(img_array)
+		score = tf.nn.softmax(predictions[0])
+
+		res=class_names[np.argmax(score)]
+		boolean="false"
+		if str(targ)==str(res):
+			boolean="true"
+		print("This image most likely belongs to {} with a {:.2f} percent confidence. => {}".format(class_names[np.argmax(score)], (100 * np.max(score)), boolean))
 
 	return model, class_names
-setup(7)
+setup(int(args.epochs))
 
 
 
