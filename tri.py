@@ -1,27 +1,22 @@
 import glob
 import os
 
-images = glob.glob('DB_clean/*.bmp')
-print(images)
-# python3 tri.py | grep bmp | wc
+#images = glob.glob('DB_clean/*.bmp')
+origin="/home/kali/.keras/datasets/DB_augmented/"
+images = glob.glob('{}*.bmp'.format(origin))
 
 directories=[]
-x=9 # longueur chemin avant nom image
-# or use split
+x=9 # longueur chemin avant nom image # or use split
 for img in images: 
-	#print(img)
+	os.system('python3 /home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/pycode_traitement_images/traitement_imagesv1.py -i {} -o {}'.format(img,img))
 	short=img.split("/")
 	short=short[-1]
 	#print(short)
 	#print(short[:-6])
 	directory=short[:-6]
-	if directory not in directories:
-		os.system("mkdir {}".format(directory))
-	os.system("mv {} {}".format(img,directory))
-
-os.system('mv 0*/ DB_clean')
-
-# to adapt: / or use keras untar
-os.system('DB_clean /home/kali/.keras/datasets')
-
+	d=origin+directory
+	if d not in directories:
+		os.system("mkdir {}".format(d))
+		directories.append(d)
+	os.system("mv {} {}".format(img,d))
 

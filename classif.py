@@ -46,7 +46,7 @@ args = parser.parse_args()
 def setup(epochs):
 
 	dataset_url="http://0.0.0.0:8000/BDD_FingerVeins.tar.gz"
-	data_dir = tf.keras.utils.get_file(fname='DB_clean', origin=dataset_url, untar=True)
+	data_dir = tf.keras.utils.get_file(fname='DB_augmented', origin=dataset_url, untar=True) # or  just import data into /home/user/.keras/datasets
 	data_dir = pathlib.Path(data_dir)
 	
 	#image_count = len(list(data_dir.glob('*/*.bmp')))
@@ -127,6 +127,7 @@ def setup(epochs):
   tf.keras.layers.MaxPooling2D(),
   tf.keras.layers.Conv2D(32, 3, activation='relu'),
   tf.keras.layers.MaxPooling2D(),
+  tf.keras.layers.Dropout(0.2),
   tf.keras.layers.Flatten(),
   tf.keras.layers.Dense(128, activation='relu'),
   tf.keras.layers.Dense(nb_classes) # nb couches sorties/classes
@@ -145,7 +146,29 @@ def setup(epochs):
 
 	test_images=val_ds
 	probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
-	predictions = probability_model.predict(test_images)	
+	predictions = probability_model.predict(test_images)
+
+	#for b in range(5):
+	##for images, labels in test_images.take(1):
+		#for i in range(1):
+				#ax = plt.subplot(3, 3, i + 1)
+				#plt.imshow(images[i].numpy().astype("uint8"))
+				#plt.title(class_names[labels[i]])
+			#print(i,": ",class_names[labels[i]])
+				#plt.axis("off")
+
+
+	#print(predictions[0])
+	#z=np.argmax(predictions[0])
+	#print(z)
+	#print(class_names[z])
+
+	#print("-----------")
+	#print(predictions[70])	
+#	#print(len(predictions[150]))
+	#y=np.argmax(predictions[70])
+	#print(y)
+	#print(class_names[y])
 
 	#if args.graph:
 	acc = history.history['accuracy']
@@ -275,7 +298,6 @@ def excel_models(nb_iter,nb_epochs):
 		if e=="true":
 			ratio+=1
 	tfr.value = '={}/{}'.format(ratio,nb_iter)
-
 
 
 	wb.save("/home/kali/Bureau/PFE/out-{}models-{}epochs.xlsx".format(nb_iter,nb_epochs)) 

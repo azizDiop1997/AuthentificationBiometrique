@@ -1,5 +1,4 @@
 import argparse
-from msilib.schema import Control
 import cv2 
 from matplotlib import pyplot as plt
 from PIL import Image, ImageFilter
