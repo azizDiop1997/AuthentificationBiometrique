@@ -15,10 +15,8 @@ help='Number of images to create')
 
 args = parser.parse_args()
 
-def augment() : # 
-# ../BDD_FingerVeins/
-	p = Augmentor.Pipeline(source_directory="/home/kali/.keras/datasets/DB_augmented/008right_ring/", output_directory="../database/")
-	
+def augment() :
+	p = Augmentor.Pipeline(source_directory="../BDD_FingerVeins/", output_directory="../database/")
 	p.random_distortion(probability=0.4,grid_width=6, grid_height=6, magnitude=8)
 	p.zoom(probability=0.2, min_factor=1.1, max_factor=1.6)
 	p.shear(probability=0.6, max_shear_left=5, max_shear_right=5)
