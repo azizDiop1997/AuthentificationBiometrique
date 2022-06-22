@@ -2,7 +2,8 @@ import glob
 import os
 
 #images = glob.glob('DB_clean/*.bmp')
-origin="/home/kali/.keras/datasets/DB_augmented/"
+#origin="/home/kali/.keras/datasets/DB_augmented/"
+origin="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/"
 images = glob.glob('{}*.bmp'.format(origin))
 
 directories=[]

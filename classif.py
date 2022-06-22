@@ -19,6 +19,8 @@ import pathlib
 
 import argparse
 
+from subprocess import *
+
 img_height = 320
 img_width = 120
 ds_size=756
@@ -28,27 +30,32 @@ nb_classes=126
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-e','--epochs',
-required="True",
+required=True,
 dest='epochs',
 help='Epochs number, determines how long the algorithm will train')
 
-parser.add_argument('-g','--graph',
-dest='graph',
-help='Displays learing graph of the model, False by default')
+parser.add_argument('-d','--demo',
+dest='demo',
+help='Displays learning graph of the model & validarion tests, False by default')
 
 parser.add_argument('-v','--verbose',
 dest='verb',
 help='Displays some informations such as model\'s summary, number of classes. False by default')
+
+parser.add_argument('-o','--order',
+dest='orderImg',
+help='Order the new images of /home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/ directory, add them to the dataset')
+
 
 args = parser.parse_args()
 
 
 def setup(epochs):
 
-	dataset_url="http://0.0.0.0:8000/BDD_FingerVeins.tar.gz"
-	data_dir = tf.keras.utils.get_file(fname='DB_augmented', origin=dataset_url, untar=True) # or  just import data into /home/user/.keras/datasets
-	data_dir = pathlib.Path(data_dir)
-	
+	##dataset_url="http://0.0.0.0:8000/BDD_FingerVeins.tar.gz"
+	##data_dir = tf.keras.utils.get_file(fname='DB_augmented', origin=dataset_url, untar=True) # or  just import data into /home/user/.keras/datasets
+	#data_dir = pathlib.Path(data_dir)
+	data_dir = pathlib.Path("/home/kali/.keras/datasets/DB_augmented") # extract_
 	#image_count = len(list(data_dir.glob('*/*.bmp')))
 	#print("images used in dataset: ",image_count)
 	
@@ -79,8 +86,9 @@ def setup(epochs):
 #		break
 
 	class_names = train_ds.class_names
-	#print("Classes: ")
-	#print(class_names)
+	if args.verb:	
+		print("Classes: ")
+		print(class_names)
 	
 	#print(train_ds)
 ##	plt.figure(figsize=(10, 10))
@@ -170,7 +178,7 @@ def setup(epochs):
 	#print(y)
 	#print(class_names[y])
 
-	#if args.graph:
+	#if args.demo:
 	acc = history.history['accuracy']
 	val_acc = history.history['val_accuracy']
 	
@@ -193,18 +201,28 @@ def setup(epochs):
 	plt.title('Training and Validation Loss')
 	plt.show()
 	
-	## test
-	#imPath = "/home/kali/.keras/datasets/004left_index_1.bmp"
-	im_paths=["004left_index_1.bmp","006left_middle_3.bmp","009right_ring_1.bmp","015right_index_4.bmp","018right_index_5.bmp","020right_index_6.bmp"]
+	# validation tests
+	# if args.demo:
+	p1 = Popen(["ls", "/home/kali/.keras/datasets/DB_augmented"], stdout=PIPE)
+	p2 = Popen(["grep", "bmp"], stdin=p1.stdout, stdout=PIPE)
+	output = p2.communicate()[0]
+	x = (output.decode("utf-8")).split("\n")
+	im_paths=x
+	im_paths.pop(-1) # delete last element which is ""
 
-
+	#print("!!!!!!!!")
+	#print(im_paths)	
+	#print("!!!!!!!!")
+		
 	for im in im_paths:
-		#path = tf.keras.utils.get_file('DB_clean', origin=im)
-		im="/home/kali/.keras/datasets/"+im
-		targ=im.split("/")[-1]
-		targ=targ[:-6]
-		print("targ=",targ)
-		print("im=",im)
+		im="/home/kali/.keras/datasets/DB_augmented/"+im
+		print("- - - -")
+		targ="null"
+		for i in class_names:
+			if str(i) in im:
+				targ=str(i)
+		print("target,image={} , {}".format(targ,im))
+		
 		img = tf.keras.utils.load_img(im, target_size=(img_height, img_width))
 		img_array = tf.keras.utils.img_to_array(img)
 		img_array = tf.expand_dims(img_array, 0) # Create a batch
@@ -216,10 +234,54 @@ def setup(epochs):
 		boolean="false"
 		if str(targ)==str(res):
 			boolean="true"
-		print("This image most likely belongs to {} with a {:.2f} percent confidence. => {}".format(class_names[np.argmax(score)], (100 * np.max(score)), boolean))
+		if targ=="null":
+			print("target doesn't exist.")
+		else:		
+			print("This image most likely belongs to {} with a {:.2f} percent confidence. => {}".format(class_names[np.argmax(score)], (100 * np.max(score)), boolean))
 
 	return model, class_names
+
+
+
+
+
+def orderNewImages():
+	origin="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/"
+	images = glob.glob('{}*.bmp'.format(origin)) # contains images that have been added with data augmentation (file.py)
+	
+	for img in images: 
+		#print(img)
+		# traitement d'image & redimension.
+		os.system('python3 /home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/pycode_traitement_images/traitement_imagesv1.py -i {} -o {}'.format(img,img))
+
+		short=img.split("/")[-1]
+		#print("/",short)
+
+		short=short.split(".")[0]
+		#print(".",short)
+
+		destClass=short.removeprefix("BDD_FingerVeins_original_")[:-2]
+		#print("dC",destClass)
+		dest="/home/kali/.keras/datasets/DB_augmented/"+destClass+"/"
+
+		os.system("mv {} {}".format(img,dest))
+		#print("moved:{} --TO-> {}".format(img,dest))
+
+
+if args.orderImg:
+	print("\t started ordering new images...")
+	orderNewImages()
+	print("\t images ready to join the dataset.")
+
 setup(int(args.epochs))
+
+
+
+
+
+
+
+
 
 
 
