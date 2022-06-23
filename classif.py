@@ -46,19 +46,21 @@ parser.add_argument('-o','--order',
 dest='orderImg',
 help='Order the new images of /home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/ directory, add them to the dataset')
 
+parser.add_argument('-r','--reducedBDD',
+required=True,
+dest='redu',
+help='Number of images to create')
 
 args = parser.parse_args()
 
 
 def setup(epochs):
 
-	##dataset_url="http://0.0.0.0:8000/BDD_FingerVeins.tar.gz"
-	##data_dir = tf.keras.utils.get_file(fname='DB_augmented', origin=dataset_url, untar=True) # or  just import data into /home/user/.keras/datasets
-	#data_dir = pathlib.Path(data_dir)
-	data_dir = pathlib.Path("/home/kali/.keras/datasets/DB_augmented") # extract_
-	#image_count = len(list(data_dir.glob('*/*.bmp')))
-	#print("images used in dataset: ",image_count)
-	
+	if args.redu=="true":	
+		data_dir = pathlib.Path("/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/DB_reduced_ordered/")
+	else:	
+		data_dir = pathlib.Path("/home/kali/.keras/datasets/DB_augmented")
+
 	imgs = list(data_dir.glob('*/*.bmp')) # images dans les sous dossiers correspondant à leur classe
 	
 	batch_size = 32
@@ -210,9 +212,6 @@ def setup(epochs):
 	im_paths=x
 	im_paths.pop(-1) # delete last element which is ""
 
-	#print("!!!!!!!!")
-	#print(im_paths)	
-	#print("!!!!!!!!")
 		
 	for im in im_paths:
 		im="/home/kali/.keras/datasets/DB_augmented/"+im
@@ -243,7 +242,7 @@ def setup(epochs):
 
 
 
-
+# data_dir = pathlib.Path("/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/DB_reduced_ordered/")
 
 def orderNewImages():
 	origin="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/"
@@ -262,7 +261,15 @@ def orderNewImages():
 
 		destClass=short.removeprefix("BDD_FingerVeins_original_")[:-2]
 		#print("dC",destClass)
-		dest="/home/kali/.keras/datasets/DB_augmented/"+destClass+"/"
+		if args.redu=="true":		
+			dest="/home/kali/.keras/datasets/extract_DB_augmented/"+destClass # reduced 
+			#BDD_FingerVeins_reduced_original_002left_index/
+			dest=dest.split("/")[-1]
+			dest=destClass=short.removeprefix("BDD_FingerVeins_reduced_original_")[:-2]
+			print("!!!",dest)
+		else:
+			dest="/home/kali/.keras/datasets/DB_augmented/"+destClass+"/" #126 classes
+	
 
 		os.system("mv {} {}".format(img,dest))
 		#print("moved:{} --TO-> {}".format(img,dest))

@@ -13,11 +13,20 @@ required=True,
 dest='n',
 help='Number of images to create')
 
+
+parser.add_argument('-r','--reducedBDD',
+required=True,
+dest='redu',
+help='Number of images to create')
+
+
 args = parser.parse_args()
 
 def augment() : 
-
-	p = Augmentor.Pipeline(source_directory="../BDD_FingerVeins/", output_directory="../database/")
+	if args.redu=="true":
+		p = Augmentor.Pipeline(source_directory="../BDD_FingerVeins_reduced/", output_directory="../database/")
+	else:
+		p = Augmentor.Pipeline(source_directory="../BDD_FingerVeins/", output_directory="../database/")
 	p.random_distortion(probability=0.2,grid_width=6, grid_height=6, magnitude=10)
 	p.zoom(probability=0.2, min_factor=1.0, max_factor=1.8)
 	p.shear(probability=0.55, max_shear_left=2, max_shear_right=8)

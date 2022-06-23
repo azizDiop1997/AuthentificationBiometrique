@@ -3,7 +3,8 @@ import os
 
 #images = glob.glob('DB_clean/*.bmp')
 #origin="/home/kali/.keras/datasets/DB_augmented/"
-origin="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/database/"
+origin="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/BDD_FingerVeins_reduced/"
+dest="/home/kali/Bureau/PFE/newGit/AuthentificationBiometrique/DB_reduced_ordered/"
 images = glob.glob('{}*.bmp'.format(origin))
 
 directories=[]
@@ -15,9 +16,10 @@ for img in images:
 	#print(short)
 	#print(short[:-6])
 	directory=short[:-6]
-	d=origin+directory
+	d=dest+directory #origin+directory
 	if d not in directories:
 		os.system("mkdir {}".format(d))
 		directories.append(d)
 	os.system("mv {} {}".format(img,d))
+	print("{} -> {}".format(img,d))
 
